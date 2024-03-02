@@ -8,14 +8,34 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var viewModel = ChatView.ViewModel()
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+            ScrollView{
+                ForEach(viewModel.message.filter({ $0.role != .system }) , id: \.id){
+                    message  in messageView(message: message)
+                }
+            }
+            HStack{
+                TextField("Text", text: $viewModel.currentInput)
+                Button {
+                    viewModel.sendMessage()
+                } label: {
+                    Image(systemName: "paperplane")
+                        .background(.black)
+                        .padding(.horizontal , 10 )
+                        .foregroundColor(.white)
+                }
+            }
         }
         .padding()
+    }
+    func messageView(message:Messages) -> some View{
+        HStack{
+            if message.role == .user {Spacer()}
+            Text(message.content)
+            if message.role  == .assistant{Spacer()}
+        }
     }
 }
 
